@@ -1,68 +1,68 @@
 /*
-* En un archivo ej1.json, guardar todas los nombres de las peliculas en las que aparece
-* el personaje Luke Skywalker. 
+* En un archivo ej1.json, guardar todas los nombres de las peliculas en las que aparece el personaje Luke Skywalker. 
 * 
 * 1) Obtener los ids de las peliculas leyendo el json del archivo people.json buscando por id=1 
-* 2) Obtener las peliculas del archivo films.json
+* 2) Obtener las peliculas del archivo people.json
 * 3) Escribir el resultado en un nuevo archivo (ej1.json) con el siguiente formato:
-* 
-*  ["pelicula1", "pelicula2", ...]
+*    ["pelicula1", "pelicula2", ...]
 */
 
-// Inclusión del módulo (core) "fs", necesario para trabajar con el file system
-// https://nodejs.org/api/modules.html#modules_core_modules
 const fs = require('fs');
 
-// constantes con las ubicaciones de los archivos
-const peopleFile = '../data/people.json';
-const filmsFile = '../data/films.json';
-const ej1File = './ej1.json';
-
-// leer el archivo de personas
-fs.readFile(peopleFile, 'utf-8', (err, pdata) => {
-	// early return en caso de error
-  if (err) {
-    return console.log(`No se pudo leer el archivo ${peopleFile}`);
-  }
-
-	// obtener el json de personas
-  let people = null;
-  try {
-    people = JSON.parse(pdata);
-  } catch (error) {
-    return console.log(`No se pudo parsear el archivo ${peopleFile}`);
-  }
-
-	// obtener el objeto de luke
-  const luke = people.find(character => character.id === '1');
-
-	// leer el archivo de películas
-  fs.readFile(filmsFile, (err, fdata) => {
-		// early return en caso de error
-    if (err) {
-      return console.log(`No se pudo leer el archivo ${filmsFile}`);
-    }
-
-		// obtener el json de películas
-    let films = null;
+const readJSON = function(file, callback) {
+  fs.readFile(file, 'utf8', (err, data) => {
+    if (err) return callback(err);
     try {
-      films = JSON.parse(fdata);
-    } catch (error) {
-      return console.log(`No se pudo parsear el archivo ${filmsFile}`);
+      return callback(null, JSON.parse(data))
     }
+    catch(err) {
+      return callback(err)
+    }
+  })  
+}
 
-		// obtener los nombres de las películas de luke
-    const lukeFilms = films
-			.filter(film => luke.films.includes(film.id))
-			.map(film => film.title);
+const writeJSON = function(file, data, callback) {
+  var json = JSON.stringify(data);
+  fs.writeFile(file, json, (err) => {
+    if (err) return callback(err);
+    callback(null, json)  
+  })
+}
 
-		// escribir en un archivo
-    fs.writeFile(ej1File, JSON.stringify(lukeFilms), err => {
-			// early return en caso de error
-      if (err) {
-        return console.log(`No se pudo escribir el archivo ${ej1File}`);
-      }
-      console.log('The luke films has been saved!');
-    });
-  });
-});
+const getPeople = function(param, callback) {
+  return readJSON('../data/people.json', (err, people) => {
+    if (err) return callback(err);
+    if (typeof param.filter === 'function') people = people.filter(param.filter);
+    if (typeof param.find === 'function') {
+      const item = people.find(param.find);
+      if (!item) return callback('not found');
+      return callback(null, item); 
+    }
+    return callback(null, people)
+  })
+}
+
+const getFilms = function(param, callback) {
+  return readJSON('../data/films.json', callback);
+}
+
+const getFilmsByActorName = function(name, callback) {
+  return getFilms(null, (err, films) => {
+    if (err) return callback(err);
+    return getPeople({
+      find: item => item.name === name
+    }, (err, person) => {
+      if (err) return callback(err);
+      return callback(null, films
+      .filter(film => person.films.includes(film.id))
+      .map(film => film.title))
+    })
+  })
+}
+	
+getFilmsByActorName('Luke Skywalker', (err, films) => {
+  writeJSON('ej1.json', films, (err) => {
+    if (err) return console.error(err);
+    console.log('ej1.json', 'written')
+  })
+})
