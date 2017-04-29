@@ -51,12 +51,11 @@ const getFilmsByActorName = function(name) {
   ])
   .then(([films, person]) => {
     return films
-    .filter(film => person.films.includes(film.id))
-    .map(film => film.title)
+    .filter(film => person.films.includes(film.id))    
   })
 }
 	
 getFilmsByActorName('Luke Skywalker')
-.then(films => writeJSON('ej4.json', films))
+.then(films => writeJSON('ej4.json', films.map(film => film.title)))
 .then(() => console.log('ej4.json', 'written'))
 .catch(err => console.error(err))

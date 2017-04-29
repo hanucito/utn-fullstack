@@ -53,15 +53,13 @@ const getFilmsByActorName = function(name, callback) {
       find: item => item.name === name
     }, (err, person) => {
       if (err) return callback(err);
-      return callback(null, films
-      .filter(film => person.films.includes(film.id))
-      .map(film => film.title))
+      return callback(null, films.filter(film => person.films.includes(film.id)))
     })
   })
 }
 	
 getFilmsByActorName('Luke Skywalker', (err, films) => {
-  writeJSON('ej1.json', films, (err) => {
+  writeJSON('ej1.json', films.map(film => film.title), (err) => {
     if (err) return console.error(err);
     console.log('ej1.json', 'written')
   })
