@@ -18,6 +18,8 @@ En los últimos años, la empresa Facebook viene revolucionando el modo en que s
 
 ### [Clase 2](clase2/README.md)
 
+### [Clase 3](clase3/README.md)
+
 ## Contacto
 
 ### Ainú Chambeaud
