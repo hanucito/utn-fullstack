@@ -7,3 +7,12 @@
 [submodule "clase6"]
 	path = clase6
 	url = https://github.com/hanucito/clase6
+[submodule "clase7"]
+	path = clase7
+	url = https://github.com/hanucito/clase7
+[submodule "clase9"]
+	path = clase9
+	url = https://github.com/hanucito/clase9
+[submodule "clase8"]
+	path = clase8
+	url = https://github.com/hanucito/clase8
